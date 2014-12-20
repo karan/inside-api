@@ -5,13 +5,15 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var mongoose = require('mongoose');
-
 if (process.env.NODE_ENV === 'production') {
     var constants = require('./config/constants.prod.js');
 } else {
     var constants = require('./config/constants.dev.js');
 }
+
+var mongoose = require('mongoose');
+mongoose.connect(constants.MongoURL, { server: { auto_reconnect: true } });
+require('./models/topic.js');
 
 var routes = require('./routes/index');
 
@@ -28,9 +30,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-require('./models/topic.js');
-mongoose.connect(constants.MongoURL, { server: { auto_reconnect: true } });
 
 app.use('/', routes);
 
